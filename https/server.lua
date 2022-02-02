@@ -59,6 +59,7 @@ local function start_ssl(self)
     end
 
     self.server.tcp_server_f = ssl_listen
+    self.server:start()
     self.redirect = https_redirect_lib.new()
     self.redirect:start(self.options.host, self.options.port80)
     self.ssl_active = true

@@ -41,9 +41,9 @@ local function test_main(test)
 
     local cert_time1 = acme_lib.certValidTo(cert_full_name)
     test:isnt(cert_time1, nil, 'Check first SSL-certificate')
-    require("fiber").sleep(1000)
+    require("fiber").sleep(1)
     
-    local r = http_client.post(echo_url, 'TEST1')
+    local r = http_client.post(echo_url, 'TEST1', {timeout=3})
     test:is(r.status, 200, 'Status response 1')
     test:is(r.body, 'TEST1', 'Body response 1')
 
@@ -54,7 +54,7 @@ local function test_main(test)
     test:isnt(cert_time2, nil, 'Check second SSL-certificate')
     test:ok(cert_time1 < cert_time2, 'Check reissue SSL-certificate over active SSL-channel')
 
-    r = http_client.post(echo_url, 'TEST2')
+    r = http_client.post(echo_url, 'TEST2', {timeout=3})
     test:is(r.status, 200, 'Status response 2')
     test:is(r.body, 'TEST2', 'Body response 2')
 
