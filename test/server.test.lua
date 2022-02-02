@@ -25,7 +25,7 @@ local function test_main(test)
         echo_url = string.format('https://%s:%d%s', options.dns_name, options.port443, echo_path)
     end
 
-    os.remove(cert_full_name)
+    --os.remove(cert_full_name)
     local server = https_lib.new(options)
     test:isnt(server, nil, 'HTTPS-server create without cert-file')
 
@@ -38,7 +38,7 @@ local function test_main(test)
 
     server:route({ path = echo_path }, echo_proc)
     server:start()
-
+return
     local cert_time1 = acme_lib.certValidTo(cert_full_name)
     test:isnt(cert_time1, nil, 'Check first SSL-certificate')
     require("fiber").sleep(1)
@@ -46,7 +46,7 @@ local function test_main(test)
     local r = http_client.post(echo_url, 'TEST1', {timeout=3})
     test:is(r.status, 200, 'Status response 1')
     test:is(r.body, 'TEST1', 'Body response 1')
-
+error('123')
     server.time_to_reissue = 2*(cert_time1 - os.time())
     server:schedule()
 
@@ -60,7 +60,7 @@ local function test_main(test)
 
     server:stop()
 
-    local r = http_client.post(echo_url, 'TEST3', {timeout=1})
+    local r = http_client.post(echo_url, 'TEST3', {timeout=3})
     test:isnt(r.status, 200, 'Status response 3')
     local reason = string.lower(r.reason)
     local timeout_pos = reason:find("timeout", 1, true)
