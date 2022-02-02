@@ -13,7 +13,7 @@ local function test_main(test)
         port80 = 80,
         port443 = 443,
         dns_name = 'vpoint.me',
-        cert_path = 'cert/',
+        cert_path = '/srv/sftp/sftp-user/https/test/cert/',
         cert_name = 'ssl-test.pem',
     }
     local cert_full_name = options.cert_path..options.cert_name
