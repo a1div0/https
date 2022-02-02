@@ -1,7 +1,8 @@
-local acme_lib = require("acme-client")
+local acme_lib = require('acme-client')
+local fio = require('fio')
 local http_server_lib = require('http.server')
-local https_redirect_lib = require("https.redirect")
-local sslsocket = require("sslsocket")
+local https_redirect_lib = require('https.redirect')
+local sslsocket = require('sslsocket')
 
 local function update_valid_flags(self)
     local diff = self.cert_valid_to - os.time()
@@ -10,10 +11,17 @@ local function update_valid_flags(self)
 end
 
 local function update_valid_to(self)
-    local ok, valid_to_time = pcall(acme_lib.certValidTo, self.cert_full_name)
-    if ok then
-        self.cert_valid_to = valid_to_time
-        update_valid_flags(self)
+    local f = fio.open(self.cert_full_name, {"O_RDONLY"})
+    if f then
+        f:close()
+        local ok, valid_to_time = pcall(acme_lib.certValidTo, self.cert_full_name)
+        if ok then
+            self.cert_valid_to = valid_to_time
+            update_valid_flags(self)
+        end
+    else
+        self.cert_need_reissue = true
+        self.cert_is_valid = false
     end
 end
 
