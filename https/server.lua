@@ -91,25 +91,17 @@ end
 local function start(self)
     update_valid_to(self)
 
-    self.ssl_active = false
-    if self.cert_is_valid then
-        start_ssl(self)
-    else
+    if self.cert_need_reissue then
         self.server = http_server_lib.new(self.options.host, self.options.port80)
         self.server:start()
-    end
-
-    if self.cert_need_reissue then
         local proc = setup_challenge_proc(self)
         local acme_client = acme_lib.new(self.options, proc)
         acme_client:getCert()
+        self.server:stop()
         update_valid_to(self)
     end
 
-    if not self.ssl_active then
-        self.server:stop()
-        start_ssl(self)
-    end
+    start_ssl(self)
 end
 
 local function stop(self)

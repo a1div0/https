@@ -25,7 +25,7 @@ local function test_main(test)
         echo_url = string.format('https://%s:%d%s', options.dns_name, options.port443, echo_path)
     end
 
-    --os.remove(cert_full_name)
+    os.remove(cert_full_name)
     local server = https_lib.new(options)
     test:isnt(server, nil, 'HTTPS-server create without cert-file')
 
