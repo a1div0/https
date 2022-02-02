@@ -29,26 +29,24 @@ local function route(self, options, proc)
     table.insert(self.route_table, {options = options, proc = proc})
 end
 
-local function ssl_listen(self, handle_function)
-    local function wrapper_handle(...)
-        handle_function(self, ...)
+local function ssl_listen(host, port, options)
+    local cert = options.http_server.cert_full_name
+    if cert == nil then
+        error('Must be define `cert_full_name` property!')
     end
 
     local ctx = sslsocket.ctx(sslsocket.methods.tlsv12)
-
-    --print("Open private key file: "..self.cert_full_name)
-    local rc = sslsocket.ctx_use_private_key_file(ctx, self.cert_full_name)
+    local rc = sslsocket.ctx_use_private_key_file(ctx, cert)
     if rc == false then
-        error('Private key is invalid: '..self.cert_full_name)
+        error('Private key is invalid: '..cert)
     end
 
-    --print("Open certificate file: "..self.cert_full_name)
-    rc = sslsocket.ctx_use_certificate_file(ctx, self.cert_full_name)
+    rc = sslsocket.ctx_use_certificate_file(ctx, cert)
     if rc == false then
-        error('Certificate is invalid: '..self.cert_full_name)
+        error('Certificate is invalid: '..cert)
     end
 
-    return sslsocket.tcp_server(self.host, self.port, wrapper_handle,nil, ctx)
+    return sslsocket.tcp_server(host, port, options.handler, nil, ctx)
 end
 
 local function start_ssl(self)
