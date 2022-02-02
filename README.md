@@ -9,7 +9,6 @@ align="right">
 * [Installation](#installation)
 * [API](#api)
 * [An example of using the module](#an-example-of-using-the-module)
-* [Possible problems](#possible-problems)
 
 ## General information
 Link to [GitHub](https://github.com/a1div0/https "GitHub").
@@ -24,9 +23,9 @@ You can:
 ``` shell
 git clone https://github.com/a1div0/https.git
 ```
-* install the `acme-client` module using `tarantoolctl`:
+* install the `https` module using `tarantoolctl`:
 ```shell
-tarantoolctl rocks install https://github.com/a1div0/https/raw/main/https-1.0.0-1.rockspec
+tarantoolctl rocks install https://raw.githubusercontent.com/a1div0/https/main/https-1.0.0-1.rockspec
 ```
 
 ## API
