@@ -5,8 +5,8 @@ local http_client = require('http.client')
 local acme_lib = require("acme-client")
 local test = tap.test('https.redirect tests')
 
---local function test_main(test)
-    --test:plan(10)
+local function test_main(test)
+    test:plan(10)
 
     local options = {
         host = '0.0.0.0',
@@ -27,7 +27,7 @@ local test = tap.test('https.redirect tests')
 
     --os.remove(cert_full_name)
     local server = https_lib.new(options)
-    --test:isnt(server, nil, 'HTTPS-server create without cert-file')
+    test:isnt(server, nil, 'HTTPS-server create without cert-file')
 
     local function echo_proc(request)
         local response = request:render{ text = request.body }
@@ -38,7 +38,7 @@ local test = tap.test('https.redirect tests')
 
     server:route({ path = echo_path }, echo_proc)
     server:start()
---[[
+
     local cert_time1 = acme_lib.certValidTo(cert_full_name)
     test:isnt(cert_time1, nil, 'Check first SSL-certificate')
     require("fiber").sleep(1)
@@ -46,7 +46,7 @@ local test = tap.test('https.redirect tests')
     local r = http_client.post(echo_url, 'TEST1', {timeout=3})
     test:is(r.status, 200, 'Status response 1')
     test:is(r.body, 'TEST1', 'Body response 1')
-error('123')
+
     server.time_to_reissue = 2*(cert_time1 - os.time())
     server:schedule()
 
@@ -65,10 +65,10 @@ error('123')
     local reason = string.lower(r.reason)
     local timeout_pos = reason:find("timeout", 1, true)
     test:isnt(timeout_pos, nil, 'Reason response 3')
-    ]]
---end
 
---test:plan(1)
---test:test('https.redirect main test', test_main)
+end
 
---os.exit(test:check() == true and 0 or -1)
+test:plan(1)
+test:test('https.redirect main test', test_main)
+
+os.exit(test:check() == true and 0 or -1)
