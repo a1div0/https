@@ -96,7 +96,7 @@ local function start(self)
         start_ssl(self)
     else
         self.server = http_server_lib.new(self.options.host, self.options.port80)
-        self.server.start()
+        self.server:start()
     end
 
     if self.cert_need_reissue then
