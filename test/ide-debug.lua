@@ -1,4 +1,4 @@
-package.cpath = package.cpath .. ';/home/alex/.local/share/JetBrains/WebStorm2021.2/EmmyLua/classes/debugger/emmy/linux/?.so'
+package.cpath = package.cpath .. ';test/?.so'
 local dbg = require('emmy_core')
 dbg.tcpListen('localhost', 9999)
 dbg.waitIDE()
