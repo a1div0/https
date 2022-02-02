@@ -36,16 +36,16 @@ local function ssl_listen(self, handle_function)
 
     local ctx = sslsocket.ctx(sslsocket.methods.tlsv12)
 
-    print("Open private key file: "..self.csrName)
-    local rc = sslsocket.ctx_use_private_key_file(ctx, self.csrName)
+    --print("Open private key file: "..self.cert_full_name)
+    local rc = sslsocket.ctx_use_private_key_file(ctx, self.cert_full_name)
     if rc == false then
-        error('Private key is invalid')
+        error('Private key is invalid: '..self.cert_full_name)
     end
 
-    print("Open certificate file: "..self.certName)
-    rc = sslsocket.ctx_use_certificate_file(ctx, self.certName)
+    --print("Open certificate file: "..self.cert_full_name)
+    rc = sslsocket.ctx_use_certificate_file(ctx, self.cert_full_name)
     if rc == false then
-        error('Certificate is invalid')
+        error('Certificate is invalid: '..self.cert_full_name)
     end
 
     return sslsocket.tcp_server(self.host, self.port, wrapper_handle,nil, ctx)
