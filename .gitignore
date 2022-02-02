@@ -22,4 +22,4 @@ CTestTestfile.cmake
 *.xlog
 .rocks
 cert
-
+.idea
