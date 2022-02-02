@@ -53,6 +53,7 @@ end
 
 local function start_ssl(self)
     self.server = http_server_lib.new(self.options.host, self.options.port443)
+    self.server.cert_full_name = self.cert_full_name
 
     for _, tuple in ipairs(self.route_table) do
         self.server:route(tuple.options, tuple.proc)
