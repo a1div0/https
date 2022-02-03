@@ -6,19 +6,47 @@ local acme_lib = require("acme-client")
 local test = tap.test('https.redirect tests')
 
 local function test_main(test)
-    test:plan(10)
+
+    test:plan(12)
+
+    local function echo_proc(request)
+        local body = request:read()
+        local response = request:render{ text = body }
+        response.headers['x-test-header'] = request.method..' '..request.path;
+        response.status = 200
+        return response
+    end
 
     local options = {
-        host = '0.0.0.0',
-        port80 = 80,
+        host = '127.0.0.1',
+        port80 = 8080,
         port443 = 443,
         dns_name = 'vpoint.me',
         cert_path = '/srv/sftp/sftp-user/https/test/cert/',
         cert_name = 'ssl-test.pem',
+        ssl = false,
     }
     local cert_full_name = options.cert_path..options.cert_name
     local echo_path = '/echo'
     local echo_url = ''
+    local server = nil
+
+    if options.port80 == 80 then
+        echo_url = 'http://'..options.host..echo_path
+    else
+        echo_url = string.format('http://%s:%d%s', options.host, options.port80, echo_path)
+    end
+
+    server = https_lib.new(options)
+    server:route({ path = echo_path }, echo_proc)
+    server:start()
+
+    local r = http_client.post(echo_url, 'TEST0', {timeout=3})
+    test:is(r.status, 200, 'Check easy mode (no SSL) - status 200')
+    test:is(r.body, 'TEST0', 'Check easy mode (no SSL) - body echo')
+
+    server:stop()
+
     if options.port443 == 443 then
         echo_url = 'https://'..options.dns_name..echo_path
     else
@@ -28,13 +56,6 @@ local function test_main(test)
     os.remove(cert_full_name)
     local server = https_lib.new(options)
     test:isnt(server, nil, 'HTTPS-server create without cert-file')
-
-    local function echo_proc(request)
-        local response = request:render{ text = request.body }
-        response.headers['x-test-header'] = request.method..' '..request.path;
-        response.status = 200
-        return response
-    end
 
     server:route({ path = echo_path }, echo_proc)
     server:start()

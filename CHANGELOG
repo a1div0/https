@@ -6,5 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.2] - 2022-02-01
+### Added
+- Easy mode (no SSL)
+
 ## [1.0.0] - 2022-02-01
 The first version has been implemented

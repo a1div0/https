@@ -50,18 +50,24 @@ local function ssl_listen(host, port, options)
 end
 
 local function start_ssl(self)
-    self.server = http_server_lib.new(self.options.host, self.options.port443)
-    self.server.cert_full_name = self.cert_full_name
+    if (self.ssl_enable) then
+        self.redirect = https_redirect_lib.new()
+        self.redirect:start(self.options.host, self.options.port80)
+
+        self.server = http_server_lib.new(self.options.host, self.options.port443)
+        self.server.tcp_server_f = ssl_listen
+        self.server.cert_full_name = self.cert_full_name
+
+        self.ssl_active = true
+    else
+        self.server = http_server_lib.new(self.options.host, self.options.port80)
+    end
 
     for _, tuple in ipairs(self.route_table) do
         self.server:route(tuple.options, tuple.proc)
     end
 
-    self.server.tcp_server_f = ssl_listen
     self.server:start()
-    self.redirect = https_redirect_lib.new()
-    self.redirect:start(self.options.host, self.options.port80)
-    self.ssl_active = true
 end
 
 local function stop_ssl(self)
@@ -89,16 +95,19 @@ local function setup_challenge_proc(self)
 end
 
 local function start(self)
-    update_valid_to(self)
 
-    if self.cert_need_reissue then
-        self.server = http_server_lib.new(self.options.host, self.options.port80)
-        self.server:start()
-        local proc = setup_challenge_proc(self)
-        local acme_client = acme_lib.new(self.options, proc)
-        acme_client:getCert()
-        self.server:stop()
+    if self.ssl_enable then
         update_valid_to(self)
+
+        if self.cert_need_reissue then
+            self.server = http_server_lib.new(self.options.host, self.options.port80)
+            self.server:start()
+            local proc = setup_challenge_proc(self)
+            local acme_client = acme_lib.new(self.options, proc)
+            acme_client:getCert()
+            self.server:stop()
+            update_valid_to(self)
+        end
     end
 
     start_ssl(self)
@@ -130,6 +139,7 @@ local exports = {
             start = start,
             stop = stop,
             schedule = schedule,
+            ssl_enable = options.ssl ~= false
         }
 
         self.options.internalIP4 = options.host or options.internalIP4
