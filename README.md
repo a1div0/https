@@ -25,7 +25,7 @@ git clone https://github.com/a1div0/https.git
 ```
 * install the `https` module using `tarantoolctl`:
 ```shell
-tarantoolctl rocks install https://raw.githubusercontent.com/a1div0/https/main/https-1.0.2-1.rockspec
+tarantoolctl rocks install https://raw.githubusercontent.com/a1div0/https/main/https-1.0.3-1.rockspec
 ```
 
 ## API

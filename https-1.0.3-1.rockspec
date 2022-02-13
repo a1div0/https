@@ -1,9 +1,9 @@
 package = 'https'
-version = '1.0.2-1'
+version = '1.0.3-1'
 source  = {
     url    = 'git+https://github.com/a1div0/https.git';
     branch = 'main';
-    tag = '1.0.2'
+    tag = '1.0.3'
 }
 description = {
     summary  = "Lua module HTTPS-server for Tarantool";

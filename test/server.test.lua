@@ -31,6 +31,8 @@ local function test_main(test)
     local echo_url = ''
     local server = nil
 
+    os.remove(cert_full_name)
+
     if options.port80 == 80 then
         echo_url = 'http://'..options.host..echo_path
     else
@@ -53,7 +55,6 @@ local function test_main(test)
         echo_url = string.format('https://%s:%d%s', options.dns_name, options.port443, echo_path)
     end
 
-    os.remove(cert_full_name)
     local server = https_lib.new(options)
     test:isnt(server, nil, 'HTTPS-server create without cert-file')
 

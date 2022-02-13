@@ -6,12 +6,17 @@ local sslsocket = require('sslsocket')
 
 local function update_valid_flags(self)
     local diff = self.cert_valid_to - os.time()
-    self.cert_need_reissue = diff < self.time_to_reissue
+    self.cert_need_reissue = self.options.ssl and (diff < self.time_to_reissue)
     self.cert_is_valid = diff >= 3 * 60
 end
 
 local function update_valid_to(self)
-    local f = fio.open(self.cert_full_name, {"O_RDONLY"})
+    local f = nil
+
+    if self.options.ssl then
+        f = fio.open(self.cert_full_name, {"O_RDONLY"})
+    end
+
     if f then
         f:close()
         local ok, valid_to_time = pcall(acme_lib.certValidTo, self.cert_full_name)
@@ -20,7 +25,7 @@ local function update_valid_to(self)
             update_valid_flags(self)
         end
     else
-        self.cert_need_reissue = true
+        self.cert_need_reissue = self.options.ssl
         self.cert_is_valid = false
     end
 end
